@@ -5,6 +5,7 @@ import com.sahet.newsbackend.model.NewsArticle;
 import com.sahet.newsbackend.model.NewsCategory;
 import com.sahet.newsbackend.repository.NewsArticleRepository;
 import com.sahet.newsbackend.repository.NewsCategoryRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -54,6 +55,43 @@ public class NewsArticleService {
         article.setPublishedAt(request.getPublishedAt() != null ? request.getPublishedAt() : LocalDateTime.now());
         article.setCategory(category);
 
+        articleRepository.save(article);
+    }
+
+    @Transactional
+    public void updateArticle(Long articleId, NewsArticleRequest request) {
+        // Fetch the existing article
+        NewsArticle article = articleRepository.findById(articleId)
+                .orElseThrow(() -> new IllegalArgumentException("Article not found with ID: " + articleId));
+
+        // Update title if provided
+        if (request.getTitle() != null && !request.getTitle().isEmpty()) {
+            article.setTitle(request.getTitle());
+        }
+
+        // Update content if provided
+        if (request.getContent() != null && !request.getContent().isEmpty()) {
+            article.setContent(request.getContent());
+        }
+
+        // Update image URL if provided
+        if (request.getImageUrl() != null && !request.getImageUrl().isEmpty()) {
+            article.setImageUrl(request.getImageUrl());
+        }
+
+        // Update published date if provided
+        if (request.getPublishedAt() != null) {
+            article.setPublishedAt(request.getPublishedAt());
+        }
+
+        // Update category if provided
+        if (request.getCategoryName() != null && !request.getCategoryName().isEmpty()) {
+            NewsCategory category = categoryRepository.findByName(request.getCategoryName())
+                    .orElseGet(() -> categoryRepository.save(new NewsCategory(request.getCategoryName())));
+            article.setCategory(category);
+        }
+
+        // Save the updated article (not strictly necessary with @Transactional)
         articleRepository.save(article);
     }
 }
