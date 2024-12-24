@@ -94,4 +94,9 @@ public class NewsArticleService {
         // Save the updated article (not strictly necessary with @Transactional)
         articleRepository.save(article);
     }
+
+    public NewsArticle getArticleById(Long id) {
+        return articleRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Article with ID " + id + " not found."));
+    }
 }

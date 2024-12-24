@@ -19,7 +19,14 @@ public class NewsController {
         this.articleService = articleService;
     }
 
-
+    @GetMapping("/{id}")
+    public ResponseEntity<NewsArticle> getArticleById(@PathVariable Long id) {
+        NewsArticle article = articleService.getArticleById(id);
+        if (article == null) {
+            return ResponseEntity.notFound().build(); // Return 404
+        }
+        return ResponseEntity.ok(article);
+    }
 
 
     @GetMapping("/all")
@@ -28,11 +35,12 @@ public class NewsController {
         return articleService.getAllArticles();
     }
 
-    @GetMapping("/{category}")
+    @GetMapping("/category/{category}")
     @Cacheable(value = "articles", key = "#category")
     public List<NewsArticle> getArticlesByCategory(@PathVariable String category) {
         return articleService.getArticlesByCategory(category);
     }
+
 
     @PostMapping("/add")
     public ResponseEntity<String> createArticle(@RequestBody NewsArticleRequest request) {
