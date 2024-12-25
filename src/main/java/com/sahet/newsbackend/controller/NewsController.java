@@ -1,6 +1,7 @@
 package com.sahet.newsbackend.controller;
 
 import com.sahet.newsbackend.dto.NewsArticleRequest;
+import com.sahet.newsbackend.dto.NewsArticleResponse;
 import com.sahet.newsbackend.model.NewsArticle;
 import com.sahet.newsbackend.service.NewsArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class NewsController {
 
     @GetMapping("/all")
     @Cacheable(value = "articles", key = "'all'")
-    public List<NewsArticle> getAllArticles() {
+    public List<NewsArticleResponse> getAllArticles() {
         return articleService.getAllArticles();
     }
 

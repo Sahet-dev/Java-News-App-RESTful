@@ -1,6 +1,7 @@
 package com.sahet.newsbackend.service;
 
 import com.sahet.newsbackend.dto.NewsArticleRequest;
+import com.sahet.newsbackend.dto.NewsArticleResponse;
 import com.sahet.newsbackend.model.NewsArticle;
 import com.sahet.newsbackend.model.NewsCategory;
 import com.sahet.newsbackend.repository.NewsArticleRepository;
@@ -33,11 +34,18 @@ public class NewsArticleService {
     }
 
     @Cacheable(value = "articles", key = "'all'")
-    public List<NewsArticle> getAllArticles() {
+    public List<NewsArticleResponse> getAllArticles() {
         return articleRepository.findAll()
                 .stream()
                 .sorted((a, b) -> b.getPublishedAt().compareTo(a.getPublishedAt())) // Sort by newest
-                .limit(100) // Optional: Limit to the latest 100 articles
+                .limit(100)
+                .map(article -> new NewsArticleResponse(
+                        article.getId(),
+                        article.getTitle(),
+                        article.getImageUrl(),
+                        article.getCategory().getName(),
+                        article.getPublishedAt()
+                ))
                 .toList();
     }
 
