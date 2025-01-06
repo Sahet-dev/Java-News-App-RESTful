@@ -42,6 +42,7 @@ public class NewsArticleService {
                 .map(article -> new NewsArticleResponse(
                         article.getId(),
                         article.getTitle(),
+                        article.getContent(),
                         article.getImageUrl(),
                         article.getCategory().getName(),
                         article.getPublishedAt()
