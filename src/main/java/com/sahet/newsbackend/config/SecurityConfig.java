@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request -> request
                         .requestMatchers("/register", "/login", "/api/news/all", "/api/news/*")
                         .permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/admin/**").authenticated())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -62,9 +62,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("*"); // Allow all origins (not recommended for production)
-        configuration.addAllowedMethod("*"); // Allow all HTTP methods (GET, POST, etc.)
-        configuration.addAllowedHeader("*"); // Allow all headers
+        configuration.addAllowedOrigin("*");
+//        configuration.addAllowedOrigin("");
+        configuration.addAllowedMethod("*");
+        configuration.addAllowedHeader("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;

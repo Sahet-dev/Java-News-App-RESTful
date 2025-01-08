@@ -43,15 +43,5 @@ public class NewsController {
     }
 
 
-    @PostMapping("/add")
-    public ResponseEntity<String> createArticle(@RequestBody NewsArticleRequest request) {
-        articleService.createArticle(request);
-        return ResponseEntity.ok("Article created successfully!");
-    }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Void> updateArticle(@PathVariable Long id, @RequestBody NewsArticleRequest request) {
-        articleService.updateArticle(id, request);
-        return ResponseEntity.noContent().build();
-    }
 }

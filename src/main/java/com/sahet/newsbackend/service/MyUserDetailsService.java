@@ -18,17 +18,6 @@ public class MyUserDetailsService implements UserDetailsService {
     }
 
 
-
-//    @Override
-//    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-//        Users user = repo.findByUsername(username);
-//
-//        if (user == null) {
-//            throw new UsernameNotFoundException(username);
-//        }
-//        return new UserPrincipal(user);
-//    }
-
     @Override
     public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
         System.out.println("Attempting to load user by: " + input);

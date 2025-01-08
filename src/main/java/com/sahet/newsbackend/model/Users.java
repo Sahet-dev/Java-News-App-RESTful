@@ -15,6 +15,7 @@ public class Users {
     private String username;
     private String email;
     private String password;
+    private String role;
 
     // Getters and setters
     public int getId() { return id; }
@@ -32,6 +33,9 @@ public class Users {
     public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
 
+    public String getRole() { return role; }
+    public void setRole(String role) { this.role = role; }
+
     @Override
     public String toString() {
         return "Users{" +
@@ -40,6 +44,7 @@ public class Users {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
+                ", role='" + role + '\'' +
                 '}';
     }
 }

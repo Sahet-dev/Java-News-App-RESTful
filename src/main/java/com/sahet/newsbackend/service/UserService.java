@@ -3,6 +3,9 @@ package com.sahet.newsbackend.service;
 import com.sahet.newsbackend.model.Users;
 import com.sahet.newsbackend.repository.UserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -12,21 +15,38 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    @Autowired
-    private UserRepo userRepo;
+    private final UserRepo userRepo;
+    private final JWTService jwtService;
+    private final AuthenticationManager authenticationManager;
 
+    // Constructor injection
     @Autowired
-    private JWTService jwtService;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
+    public UserService(UserRepo userRepo, JWTService jwtService, AuthenticationManager authenticationManager) {
+        this.userRepo = userRepo;
+        this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
+    }
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);
 
-    public Users register(Users user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return  userRepo.save(user);
+    public ResponseEntity<?> register(Users user) {
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            if (user.getRole() != null && !user.getRole().equals("USER")) {
+                throw new IllegalArgumentException("Cannot assign role: " + user.getRole());
+            }
+            user.setRole("USER");
+
+            userRepo.save(user);
+            return ResponseEntity.status(HttpStatus.CREATED).body("User registered successfully.");
+        } catch (DataIntegrityViolationException e) {
+            // Handle duplicate username error
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Username already exists.");
+        }
     }
+
+
 
     public String verify(Users user) {
         Authentication auth = authenticationManager.authenticate(
