@@ -35,12 +35,14 @@ public class JWTService {
 
     public String generateToken(String username) {
         Map<String, Object> claims = new HashMap<>();
+        long expirationTimeInMillis = 1000 * 60 * 60 * 24 * 7;
+
         return Jwts.builder()
                 .claims()
                 .add(claims)
                 .subject(username)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 60 * 60 * 30))
+                .expiration(new Date(System.currentTimeMillis() + expirationTimeInMillis))
                 .and()
                 .signWith(getKey())
                 .compact();
