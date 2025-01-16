@@ -58,6 +58,8 @@ public class NewsArticle {
     }
 
     private String title;
+
+    @Column(name = "content", columnDefinition = "TEXT")
     private String content;
     private String imageUrl;
     private LocalDateTime publishedAt;
