@@ -6,8 +6,11 @@ import com.sahet.newsbackend.model.NewsArticle;
 import com.sahet.newsbackend.model.NewsCategory;
 import com.sahet.newsbackend.repository.NewsArticleRepository;
 import com.sahet.newsbackend.repository.NewsCategoryRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -42,6 +45,7 @@ public class NewsArticleService {
                 .map(article -> new NewsArticleResponse(
                         article.getId(),
                         article.getTitle(),
+                        article.getContent(),
                         article.getImageUrl(),
                         article.getCategory().getName(),
                         article.getPublishedAt()
@@ -49,6 +53,7 @@ public class NewsArticleService {
                 .toList();
     }
 
+    @CacheEvict(value = "articles", key = "'all'", beforeInvocation = true)
     public void createArticle(NewsArticleRequest request) {
         NewsCategory category = categoryRepository.findByName(request.getCategoryName())
                 .orElseGet(() -> {
@@ -66,28 +71,27 @@ public class NewsArticleService {
         articleRepository.save(article);
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = "articles", key = "'all'", beforeInvocation = true),
+            @CacheEvict(value = "articles", key = "#request.getCategoryName()", beforeInvocation = true)
+    })
     @Transactional
     public void updateArticle(Long articleId, NewsArticleRequest request) {
-        // Fetch the existing article
         NewsArticle article = articleRepository.findById(articleId)
                 .orElseThrow(() -> new IllegalArgumentException("Article not found with ID: " + articleId));
 
-        // Update title if provided
         if (request.getTitle() != null && !request.getTitle().isEmpty()) {
             article.setTitle(request.getTitle());
         }
 
-        // Update content if provided
         if (request.getContent() != null && !request.getContent().isEmpty()) {
             article.setContent(request.getContent());
         }
 
-        // Update image URL if provided
         if (request.getImageUrl() != null && !request.getImageUrl().isEmpty()) {
             article.setImageUrl(request.getImageUrl());
         }
 
-        // Update published date if provided
         if (request.getPublishedAt() != null) {
             article.setPublishedAt(request.getPublishedAt());
         }
@@ -104,7 +108,15 @@ public class NewsArticleService {
     }
 
     public NewsArticle getArticleById(Long id) {
-        return articleRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Article with ID " + id + " not found."));
+        return articleRepository.findById(id).orElse(null);
     }
+
+
+    @CacheEvict(value = "articles", allEntries = true)
+    public void deleteArticle(Long id) {
+        NewsArticle article = articleRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Article not found with id: " + id));
+        articleRepository.delete(article);
+    }
+
 }
