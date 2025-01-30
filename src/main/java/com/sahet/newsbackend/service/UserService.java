@@ -48,39 +48,14 @@ public class UserService {
 
 
 
-//    public String verify(Users user) {
-//        Authentication auth = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
-//        );
-//
-//        if (auth.isAuthenticated()) {
-//            Users dbUser = userRepo.findByUsername(user.getUsername());
-//            return String.valueOf(jwtService.generateToken(user.getUsername()));
-//        }
-//        return "Auth Check Failed";
-//    }
-
-
-
     public String verify(Users user) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
 
         if (auth.isAuthenticated()) {
-            // Fetch the user's role from the database
-            Users dbUser = userRepo.findByUsername(user.getUsername()); // Assuming you have this repository method
-            String token = jwtService.generateToken(user.getUsername());
-
-            if ("ADMIN".equalsIgnoreCase(dbUser.getRole())) {
-                return "{\"token\":\"" + token + "\", \"role\":\"ADMIN\"}";
-            }
-
-            return "{\"token\":\"" + token + "\", \"role\":\"USER\"}";
+            return String.valueOf(jwtService.generateToken(user.getUsername()));
         }
-
         return "Auth Check Failed";
     }
-
-
 }

@@ -21,23 +21,13 @@ public class NewsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NewsArticleResponse> getArticleById(@PathVariable Long id) {
+    public ResponseEntity<NewsArticle> getArticleById(@PathVariable Long id) {
         NewsArticle article = articleService.getArticleById(id);
         if (article == null) {
             return ResponseEntity.notFound().build(); // Return 404
         }
-        // Map NewsArticle to NewsArticleResponse
-        NewsArticleResponse response = new NewsArticleResponse(
-                article.getId(),
-                article.getTitle(),
-                article.getContent(),
-                article.getImageUrl(),
-                article.getCategory().getName(),
-                article.getPublishedAt()
-        );
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(article);
     }
-
 
 
     @GetMapping("/all")
