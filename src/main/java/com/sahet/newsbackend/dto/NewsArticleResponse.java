@@ -19,6 +19,14 @@ public class NewsArticleResponse {
         this.title = title;
     }
 
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+    }
+
     public String getImageUrl() {
         return imageUrl;
     }
@@ -45,19 +53,21 @@ public class NewsArticleResponse {
 
     private Long id;
     private String title;
+    private String content;
     private String imageUrl;
     private String categoryName;
     private LocalDateTime publishedAt;
 
     // Constructor
-    public NewsArticleResponse(Long id, String title, String imageUrl, String categoryName, LocalDateTime publishedAt) {
+    public NewsArticleResponse(Long id, String title, String content, String imageUrl, String categoryName, LocalDateTime publishedAt) {
         this.id = id;
         this.title = title;
+        this.content = content;
         this.imageUrl = imageUrl;
         this.categoryName = categoryName;
         this.publishedAt = publishedAt;
     }
 
-    // Getters and setters
+
 }
 

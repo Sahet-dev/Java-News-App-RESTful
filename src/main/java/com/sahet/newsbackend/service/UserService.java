@@ -9,8 +9,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class UserService {
@@ -48,14 +52,46 @@ public class UserService {
 
 
 
+//    public String verify(Users user) {
+//        Authentication auth = authenticationManager.authenticate(
+//                new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
+//        );
+//
+//        if (auth.isAuthenticated()) {
+//            return String.valueOf(jwtService.generateToken(user.getUsername()));
+//        }
+//        return "Auth Check Failed";
+//    }
+
     public String verify(Users user) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword())
         );
 
         if (auth.isAuthenticated()) {
-            return String.valueOf(jwtService.generateToken(user.getUsername()));
+            Users dbUser = userRepo.findByUsername(user.getUsername());
+            String token = jwtService.generateToken(user.getUsername());
+            if ("ADMIN".equalsIgnoreCase(dbUser.getRole())) {
+                return "{\"token\":\"" + token + "\", \"role\":\"ADMIN\"}";
+            }
+            return "{\"token\":\"" + token + "\", \"role\":\"USER\"}";
         }
         return "Auth Check Failed";
     }
+
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users user = userRepo.findByUsername(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        // Convert Users entity to UserDetails implementation
+        return org.springframework.security.core.userdetails.User
+                .withUsername(user.getUsername())
+                .password(user.getPassword())  // Assuming password is hashed
+                .build();
+    }
+
+
 }
