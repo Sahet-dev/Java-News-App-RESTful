@@ -21,12 +21,12 @@ public class NewsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<NewsArticle> getArticleById(@PathVariable Long id) {
-        NewsArticle article = articleService.getArticleById(id);
-        if (article == null) {
-            return ResponseEntity.notFound().build(); // Return 404
+    public ResponseEntity<NewsArticleResponse> getArticleById(@PathVariable Long id) {
+        NewsArticleResponse articleResponse = articleService.getArticleById(id);
+        if (articleResponse == null) {
+            return ResponseEntity.notFound().build();
         }
-        return ResponseEntity.ok(article);
+        return ResponseEntity.ok(articleResponse);
     }
 
 

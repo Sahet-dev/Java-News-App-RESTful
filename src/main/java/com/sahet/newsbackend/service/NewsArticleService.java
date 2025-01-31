@@ -53,22 +53,44 @@ public class NewsArticleService {
                 .toList();
     }
 
+//    @CacheEvict(value = "articles", key = "'all'", beforeInvocation = true)
+//    public void createArticle(NewsArticleRequest request) {
+//        NewsCategory category = categoryRepository.findByName(request.getCategoryName())
+//                .orElseGet(() -> {
+//                    NewsCategory newCategory = new NewsCategory(request.getCategoryName());
+//                    return categoryRepository.save(newCategory);
+//                });
+//
+//        NewsArticle article = new NewsArticle();
+//        article.setTitle(request.getTitle());
+//        article.setContent(request.getContent());
+//        article.setImageUrl(request.getImageUrl());
+//        article.setPublishedAt(request.getPublishedAt() != null ? request.getPublishedAt() : LocalDateTime.now());
+//        article.setCategory(category);
+//
+//        articleRepository.save(article);
+//    }
+
     @CacheEvict(value = "articles", key = "'all'", beforeInvocation = true)
     public void createArticle(NewsArticleRequest request) {
-        NewsCategory category = categoryRepository.findByName(request.getCategoryName())
-                .orElseGet(() -> {
-                    NewsCategory newCategory = new NewsCategory(request.getCategoryName());
-                    return categoryRepository.save(newCategory);
-                });
+        try {
+            NewsCategory category = categoryRepository.findByName(request.getCategoryName())
+                    .orElseGet(() -> {
+                        NewsCategory newCategory = new NewsCategory(request.getCategoryName());
+                        return categoryRepository.save(newCategory);
+                    });
 
-        NewsArticle article = new NewsArticle();
-        article.setTitle(request.getTitle());
-        article.setContent(request.getContent());
-        article.setImageUrl(request.getImageUrl());
-        article.setPublishedAt(request.getPublishedAt() != null ? request.getPublishedAt() : LocalDateTime.now());
-        article.setCategory(category);
+            NewsArticle article = new NewsArticle();
+            article.setTitle(request.getTitle());
+            article.setContent(request.getContent());
+            article.setImageUrl(request.getImageUrl());
+            article.setPublishedAt(request.getPublishedAt() != null ? request.getPublishedAt() : LocalDateTime.now());
+            article.setCategory(category);
 
-        articleRepository.save(article);
+            articleRepository.save(article);
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to create article: " + e.getMessage());
+        }
     }
 
     @Caching(evict = {
@@ -107,8 +129,21 @@ public class NewsArticleService {
         articleRepository.save(article);
     }
 
-    public NewsArticle getArticleById(Long id) {
-        return articleRepository.findById(id).orElse(null);
+    public NewsArticleResponse getArticleById(Long id) {
+        NewsArticle article = articleRepository.findById(id).orElse(null);
+        if (article == null) {
+            return null;
+        }
+
+        // Convert entity to DTO
+        return new NewsArticleResponse(
+                article.getId(),
+                article.getTitle(),
+                article.getContent(),
+                article.getImageUrl(),
+                article.getCategory().getName(), // Extract category name
+                article.getPublishedAt()
+        );
     }
 
 

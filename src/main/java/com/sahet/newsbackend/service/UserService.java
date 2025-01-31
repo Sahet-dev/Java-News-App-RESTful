@@ -86,10 +86,9 @@ public class UserService {
             throw new UsernameNotFoundException("User not found");
         }
 
-        // Convert Users entity to UserDetails implementation
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
-                .password(user.getPassword())  // Assuming password is hashed
+                .password(user.getPassword())
                 .build();
     }
 
